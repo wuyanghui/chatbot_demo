@@ -1,9 +1,9 @@
 {
-  "version": 3,
+  "version": 2,
   "cleanUrls": true,
   "headers": [
     {
-      "source": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|webp|json|txt|woff|woff2|ttf|otf))",
+      "source": "/(.*\\.(?:css|js|png|jpg|jpeg|gif|svg|ico|webp|json|txt|woff|woff2|ttf|otf))$",
       "headers": [
         {
           "key": "Cache-Control",
@@ -12,16 +12,14 @@
       ]
     },
     {
-      "source": "/",
-      "headers": [
+      "source": "/(.*)",
+      "has": [
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/html.*"
         }
-      ]
-    },
-    {
-      "source": "/index.html",
+      ],
       "headers": [
         {
           "key": "Cache-Control",
@@ -30,16 +28,17 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "dest": "/index.html",
-      "headers": {
-        "Cache-Control": "public, max-age=0, must-revalidate"
-      }
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept",
+          "value": ".*text/html.*"
+        }
+      ],
+      "destination": "/index.html"
     }
   ]
 }
