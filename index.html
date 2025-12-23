@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Light Chat</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="chat-shell">
+      <header class="chat-header">
+        <h1>Light Chat</h1>
+      </header>
+      <section
+        class="chat-log"
+        aria-live="polite"
+        aria-label="Chat transcript"
+        role="log"
+      ></section>
+      <form class="chat-input" novalidate>
+        <label class="sr-only" for="message">Your message</label>
+        <textarea
+          id="message"
+          name="message"
+          rows="3"
+          placeholder="Type your message..."
+          required
+          aria-required="true"
+        ></textarea>
+        <div class="chat-actions">
+          <span class="status" role="status" aria-live="assertive"></span>
+          <button type="submit">Send</button>
+        </div>
+      </form>
+    </main>
+    <script src="app.js" defer></script>
+  </body>
+</html>
