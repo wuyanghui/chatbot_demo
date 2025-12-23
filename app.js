@@ -61,27 +61,21 @@ async function requestCompletion(input) {
       throw new Error(`Malformed JSON response: ${text}`);
     }
 
-    const assistantMessage =
-      payload?.graph_output ?? payload?.output ?? payload?.message;
-
-    if (typeof assistantMessage === 'string' && assistantMessage.trim()) {
-      return assistantMessage.trim();
+    if (typeof payload === 'string') {
+      const normalized = payload.trim();
+      if (normalized) {
+        return normalized;
+      }
     }
 
-    if (Array.isArray(payload?.recommended_listing)) {
-      return payload.recommended_listing
-        .map((listing, index) => {
-          const label = listing?.location ? `${index + 1}. ${listing.location}` : `${index + 1}. Listing`;
-          const details = Object.entries(listing || {})
-            .filter(([key, value]) => value && key !== 'location')
-            .map(([key, value]) => `${key}: ${value}`)
-            .join('\n');
-          return [label, details].filter(Boolean).join('\n');
-        })
-        .join('\n\n');
+    if (payload && typeof payload === 'object') {
+      const serialized = JSON.stringify(payload, null, 2);
+      if (serialized) {
+        return serialized;
+      }
     }
 
-    throw new Error('Assistant response missing expected fields.');
+    throw new Error('Assistant response missing expected data.');
   } catch (error) {
     logFetchError(error, { endpoint: API_ENDPOINT, origin: ALLOWED_ORIGIN });
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
