@@ -1,4 +1,16 @@
 const UPSTREAM_URL = 'https://landy-ai.vercel.app/invoke';
+const BYPASS_TOKEN = process.env.VERCEL_BYPASS_TOKEN;
+
+function buildUpstreamUrl() {
+  if (!BYPASS_TOKEN) {
+    return UPSTREAM_URL;
+  }
+
+  const url = new URL(UPSTREAM_URL);
+  url.searchParams.set('x-vercel-set-bypass-cookie', 'true');
+  url.searchParams.set('x-vercel-protection-bypass', BYPASS_TOKEN);
+  return url.toString();
+}
 
 function setCorsHeaders(res, originHeader, allowHeadersValue) {
   res.setHeader('Access-Control-Allow-Origin', originHeader ?? '*');
@@ -54,7 +66,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstreamResponse = await fetch(UPSTREAM_URL, {
+    const upstreamResponse = await fetch(buildUpstreamUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
