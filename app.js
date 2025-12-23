@@ -4,7 +4,7 @@ const chatLog = document.querySelector('.chat-log');
 const submitButton = form?.querySelector('button[type="submit"]');
 const statusEl = form?.querySelector('.status');
 
-const API_ENDPOINT = 'https://landy-ai.vercel.app/invoke';
+const API_ENDPOINT = '/api/proxy-invoke';
 const ALLOWED_ORIGIN = window.location.origin;
 
 function logFetchError(error, context = {}) {
@@ -45,7 +45,6 @@ async function requestCompletion(input) {
         user_input: input,
         thread_id: crypto.randomUUID?.() ?? `thread-${Date.now()}`,
       }),
-      mode: 'cors',
       credentials: 'omit',
     });
 
