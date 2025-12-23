@@ -5,6 +5,14 @@ const submitButton = form?.querySelector('button[type="submit"]');
 const statusEl = form?.querySelector('.status');
 
 const API_ENDPOINT = 'https://landy-ai.vercel.app/invoke';
+const ALLOWED_ORIGIN = window.location.origin;
+
+function logFetchError(error, context = {}) {
+  console.groupCollapsed('[requestCompletion] Fetch failure');
+  console.error(error);
+  console.info('Context:', context);
+  console.groupEnd();
+}
 
 function appendMessage(content, role = 'assistant') {
   if (!chatLog) return;
@@ -27,26 +35,63 @@ function setLoadingState(isLoading, message = '') {
 }
 
 async function requestCompletion(input) {
-  const response = await fetch(API_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ user_input: input }),
-  });
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_input: input,
+        thread_id: crypto.randomUUID?.() ?? `thread-${Date.now()}`,
+      }),
+      mode: 'cors',
+      credentials: 'omit',
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Request failed (${response.status}): ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '<unreadable body>');
+      throw new Error(`Request failed (${response.status}): ${errorText}`);
+    }
+
+    const text = await response.text();
+    let payload;
+    try {
+      payload = JSON.parse(text);
+    } catch (parseError) {
+      throw new Error(`Malformed JSON response: ${text}`);
+    }
+
+    const assistantMessage =
+      payload?.graph_output ?? payload?.output ?? payload?.message;
+
+    if (typeof assistantMessage === 'string' && assistantMessage.trim()) {
+      return assistantMessage.trim();
+    }
+
+    if (Array.isArray(payload?.recommended_listing)) {
+      return payload.recommended_listing
+        .map((listing, index) => {
+          const label = listing?.location ? `${index + 1}. ${listing.location}` : `${index + 1}. Listing`;
+          const details = Object.entries(listing || {})
+            .filter(([key, value]) => value && key !== 'location')
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('\n');
+          return [label, details].filter(Boolean).join('\n');
+        })
+        .join('\n\n');
+    }
+
+    throw new Error('Assistant response missing expected fields.');
+  } catch (error) {
+    logFetchError(error, { endpoint: API_ENDPOINT, origin: ALLOWED_ORIGIN });
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error(
+        'Network request failed. Please check your connection or CORS configuration.'
+      );
+    }
+    throw error;
   }
-
-  const payload = await response.json();
-
-  if (payload?.output) {
-    return String(payload.output);
-  }
-
-  throw new Error('Malformed response from assistant.');
 }
 
 function handleError(error) {
