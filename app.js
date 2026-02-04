@@ -6,6 +6,21 @@ const statusEl = form?.querySelector('.status');
 
 const API_ENDPOINT = '/api/proxy-invoke';
 const ALLOWED_ORIGIN = window.location.origin;
+const STATE_STORAGE_KEY = 'light-chat-state-id';
+const stateId = getStateId();
+
+function getStateId() {
+  try {
+    const existing = window.localStorage?.getItem(STATE_STORAGE_KEY);
+    if (existing) return existing;
+    const generated = crypto.randomUUID?.() ?? `state-${Date.now()}`;
+    window.localStorage?.setItem(STATE_STORAGE_KEY, generated);
+    return generated;
+  } catch (error) {
+    console.warn('[requestCompletion] Unable to persist state id', error);
+    return crypto.randomUUID?.() ?? `state-${Date.now()}`;
+  }
+}
 
 function logFetchError(error, context = {}) {
   console.groupCollapsed('[requestCompletion] Fetch failure');
@@ -42,16 +57,8 @@ async function requestCompletion(input) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-<<<<<<< HEAD
-        ...(selectedModel === 'v2'
-          ? { message: input }
-          : { user_input: input }),
-        thread_id: threadId,
-        model: selectedModel,
-=======
         user_input: input,
-        thread_id: crypto.randomUUID?.() ?? `thread-${Date.now()}`,
->>>>>>> parent of 43e8501 (v2 update  push)
+        state_id: stateId,
       }),
       credentials: 'omit',
     });
