@@ -219,32 +219,6 @@ body {
   outline-offset: 2px;
 }
 
-.thread-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.thread-field label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: rgba(26, 31, 43, 0.75);
-}
-
-.thread-field input {
-  padding: 0.55rem 0.75rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(26, 31, 43, 0.12);
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.thread-field input:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(45, 108, 223, 0.15);
-}
-
 .chat-input textarea {
   width: 100%;
   resize: vertical;
