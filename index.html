@@ -1,38 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Light Chat</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landy AI Console</title>
+    <meta name="description" content="Lightweight console for Landy AI agents" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <main class="chat-shell">
-      <header class="chat-header">
-        <h1>Light Chat</h1>
-      </header>
-      <section
-        class="chat-log"
-        aria-live="polite"
-        aria-label="Chat transcript"
-        role="log"
-      ></section>
-      <form class="chat-input" novalidate>
-        <label class="sr-only" for="message">Your message</label>
-        <textarea
-          id="message"
-          name="message"
-          rows="3"
-          placeholder="Type your message..."
-          required
-          aria-required="true"
-        ></textarea>
-        <div class="chat-actions">
-          <span class="status" role="status" aria-live="assertive"></span>
-          <button type="submit">Send</button>
-        </div>
-      </form>
-    </main>
-    <script src="app.js" defer></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
