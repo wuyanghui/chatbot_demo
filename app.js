@@ -5,6 +5,7 @@ const submitButton = form?.querySelector('button[type="submit"]');
 const statusEl = form?.querySelector('.status');
 const hiddenModelInput = document.querySelector('#selected-model');
 const modelButtons = document.querySelectorAll('.model-button');
+const threadInput = document.querySelector('#thread-id');
 
 const API_ENDPOINT = '/api/proxy-invoke';
 const ALLOWED_ORIGIN = window.location.origin;
@@ -146,7 +147,8 @@ function setLoadingState(isLoading, message = '') {
 async function requestCompletion(input) {
   const selectedModel = hiddenModelInput?.value || 'v1';
   const endpoint = MODEL_ENDPOINTS[selectedModel] || API_ENDPOINT;
-  const threadId = crypto.randomUUID?.() ?? `thread-${Date.now()}`;
+  const providedThreadId = threadInput?.value.trim();
+  const threadId = providedThreadId || (crypto.randomUUID?.() ?? `thread-${Date.now()}`);
   console.info('[requestCompletion] Dispatch', { selectedModel, endpoint, threadId });
   try {
     const response = await fetch(endpoint, {
