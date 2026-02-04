@@ -24,6 +24,14 @@ export default async function handler(req, res) {
   const origin = req.headers.origin;
   const allowHeaders = req.headers['access-control-request-headers'] || 'Content-Type, Authorization';
 
+  console.info('[proxy-invoke] Incoming request', {
+    method: req.method,
+    origin,
+    hasBody: Boolean(req.body),
+    contentType: req.headers['content-type'],
+    bodyType: typeof req.body,
+  });
+
   setCorsHeaders(res, origin, allowHeaders);
 
   if (req.method === 'OPTIONS') {
@@ -61,12 +69,20 @@ export default async function handler(req, res) {
       });
     }
   } catch (error) {
+    console.error('[proxy-invoke] Payload parsing failed', error);
     res.status(400).json({ error: 'Invalid JSON payload' });
     return;
   }
 
   try {
-    const upstreamResponse = await fetch(buildUpstreamUrl(), {
+    const upstreamUrl = buildUpstreamUrl();
+    console.info('[proxy-invoke] Forwarding payload upstream', {
+      upstreamUrl,
+      keys: payload ? Object.keys(payload) : [],
+      payloadSample: JSON.stringify(payload)?.slice(0, 200),
+    });
+
+    const upstreamResponse = await fetch(upstreamUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,8 +97,13 @@ export default async function handler(req, res) {
     }
 
     const text = await upstreamResponse.text();
+    console.info('[proxy-invoke] Upstream response received', {
+      status: upstreamResponse.status,
+      contentLength: text.length,
+    });
     res.send(text);
   } catch (error) {
+    console.error('[proxy-invoke] Upstream request failed', error);
     res.status(502).json({ error: 'Upstream request failed' });
   }
 }
