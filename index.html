@@ -18,6 +18,18 @@
         role="log"
       ></section>
       <form class="chat-input" novalidate>
+        <div class="model-selector" role="group" aria-label="Model selection">
+          <span class="model-label">Model</span>
+          <div class="model-selector-buttons">
+            <button type="button" class="model-button is-selected" data-model="v1">
+              V1
+            </button>
+            <button type="button" class="model-button" data-model="v2">
+              V2
+            </button>
+          </div>
+          <input type="hidden" name="model" id="selected-model" value="v1" />
+        </div>
         <label class="sr-only" for="message">Your message</label>
         <textarea
           id="message"

@@ -1,13 +1,12 @@
-const UPSTREAM_URL = 'https://landy-ai.vercel.app/invoke';
-const UPSTREAM_V2_URL = 'https://landy-ai.vercel.app/api/v2/invoke';
+const UPSTREAM_URL = 'https://landy-ai.vercel.app/api/v2/invoke';
 const BYPASS_TOKEN = process.env.VERCEL_BYPASS_TOKEN;
 
-function buildUpstreamUrl(base = UPSTREAM_URL) {
+function buildUpstreamUrl() {
   if (!BYPASS_TOKEN) {
-    return base;
+    return UPSTREAM_URL;
   }
 
-  const url = new URL(base);
+  const url = new URL(UPSTREAM_URL);
   url.searchParams.set('x-vercel-set-bypass-cookie', 'true');
   url.searchParams.set('x-vercel-protection-bypass', BYPASS_TOKEN);
   return url.toString();
@@ -66,11 +65,11 @@ export default async function handler(req, res) {
     return;
   }
 
-  const model = payload?.model === 'v2' ? 'v2' : 'v1';
-  const upstreamBase = model === 'v2' ? UPSTREAM_V2_URL : UPSTREAM_URL;
+  // Ensure downstream sees the selected model
+  payload.model = 'v2';
 
   try {
-    const upstreamResponse = await fetch(buildUpstreamUrl(upstreamBase), {
+    const upstreamResponse = await fetch(buildUpstreamUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
