@@ -157,7 +157,9 @@ async function requestCompletion(input) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        user_input: input,
+        ...(selectedModel === 'v2'
+          ? { message: input }
+          : { user_input: input }),
         thread_id: threadId,
         model: selectedModel,
       }),
